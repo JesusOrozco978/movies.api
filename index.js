@@ -1,48 +1,14 @@
-const { response } = require('express')
+const bodyParser = require('body-parser')
 const express = require('express')
-const { Server, request } = require('http')
-
-const movies = require('./movies')
+const { getALLMovies, getTitleAndDirector, saveNewMovie } = require('./controller/movies')
 
 const app = express()
-const bodyParser = require('body-parser')
 
-app.get('/movies', (request, response) => {
-  return response.send(movies)
-})
+app.get('/movies', getALLMovies)
 
-app.get('/movies/:directors', (request, response) => {
-  const directors = request.params.directors
-  const foundDirectors = movies.filter((movie) => movie.director == directors)
+app.get('/movies/:id', getTitleAndDirector)
 
-  return response.send(foundDirectors)
-})
-
-app.get('/movies/:title', (request, response) => {
-  const title = request.params.title
-  const foundMovie = movies.filter((movie) => movie.title == title)
-
-  return response.send(foundMovie)
-})
-
-app.post('/', bodyParser.json(), (request, response) => {
-  const {
-    title, directors, releaseDate, rating, runTime, genres
-  } = request.body
-
-  if (!title || !directors || !releaseDate || !rating || !runTime || !genres) {
-    return response.status(400).send('This is an error 400')
-  }
-  const newMovie = {
-    title, directors, releaseDate, rating, runTime, genres
-  }
-
-  movies.push(newMovie)
-
-  return response.status(201).send(newMovie)
-})
-
-app.put('/',)
+app.post('/movies', bodyParser.json(), saveNewMovie)
 
 app.all('*', (request, response) => {
   return response.status(404).send('This is a 404 error')
